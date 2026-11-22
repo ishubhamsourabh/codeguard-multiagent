@@ -1,0 +1,229 @@
+[
+  {
+    "task_id": "b01_slugify",
+    "category": "coding",
+    "buggy_seed": false,
+    "intent": {
+      "task_id": "b01_slugify",
+      "title": "Slug generator",
+      "description": "Convert an arbitrary title string into a lowercase, hyphen-separated URL slug.",
+      "function_name": "slugify",
+      "signature": "slugify(title: str) -> str",
+      "requirements": [
+        "Lowercase the result",
+        "Replace every run of non-alphanumeric characters with a single hyphen",
+        "Strip leading and trailing hyphens",
+        "Raise ValueError when the input is empty or produces an empty slug"
+      ],
+      "example": "slugify('Hello, World! 2026') -> 'hello-world-2026'",
+      "extra_tests": "def test_title_with_year():\n    import candidate\n    assert candidate.slugify('Data Science 101') == 'data-science-101'\n\ndef test_underscore_becomes_hyphen():\n    import candidate\n    assert candidate.slugify('a_b') == 'a-b'\n"
+    },
+    "hidden_tests": "def test_basic():\n    import candidate\n    assert candidate.slugify('Hello, World! 2026') == 'hello-world-2026'\n\ndef test_multiple_spaces():\n    import candidate\n    assert candidate.slugify('a   b') == 'a-b'\n\ndef test_strips_symbols():\n    import candidate\n    assert candidate.slugify('  --Hi--  ') == 'hi'\n\ndef test_empty_raises():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.slugify('!!!')\n",
+    "acceptance_tests": "def test_title_with_year():\n    import candidate\n    assert candidate.slugify('Data Science 101') == 'data-science-101'\n\ndef test_underscore_becomes_hyphen():\n    import candidate\n    assert candidate.slugify('a_b') == 'a-b'\n"
+  },
+  {
+    "task_id": "b02_parse_duration",
+    "category": "coding",
+    "buggy_seed": false,
+    "intent": {
+      "task_id": "b02_parse_duration",
+      "title": "Duration parser",
+      "description": "Parse a compact duration string such as '1h30m' or '45s' into total seconds.",
+      "function_name": "parse_duration",
+      "signature": "parse_duration(text: str) -> int",
+      "requirements": [
+        "Support the units h, m and s in any order",
+        "Return the total number of seconds as an int",
+        "Reject malformed input with ValueError",
+        "Reject an empty string with ValueError"
+      ],
+      "example": "parse_duration('1h30m') -> 5400",
+      "extra_tests": "def test_two_hours():\n    import candidate\n    assert candidate.parse_duration('2h') == 7200\n\ndef test_ninety_seconds():\n    import candidate\n    assert candidate.parse_duration('90s') == 90\n"
+    },
+    "hidden_tests": "def test_hours_minutes():\n    import candidate\n    assert candidate.parse_duration('1h30m') == 5400\n\ndef test_seconds_only():\n    import candidate\n    assert candidate.parse_duration('45s') == 45\n\ndef test_mixed_order():\n    import candidate\n    assert candidate.parse_duration('30m1h') == 5400\n\ndef test_bad_input_raises():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.parse_duration('abc')\n\ndef test_empty_raises():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.parse_duration('')\n",
+    "acceptance_tests": "def test_two_hours():\n    import candidate\n    assert candidate.parse_duration('2h') == 7200\n\ndef test_ninety_seconds():\n    import candidate\n    assert candidate.parse_duration('90s') == 90\n"
+  },
+  {
+    "task_id": "b03_chunk_list",
+    "category": "coding",
+    "buggy_seed": false,
+    "intent": {
+      "task_id": "b03_chunk_list",
+      "title": "List chunker",
+      "description": "Split a list into consecutive chunks of a fixed size.",
+      "function_name": "chunk",
+      "signature": "chunk(items: list[int], size: int) -> list[list[int]]",
+      "requirements": [
+        "Return a list of lists, the last chunk possibly shorter",
+        "Raise ValueError when size is less than 1",
+        "Return an empty list for empty input",
+        "Do not mutate the input list"
+      ],
+      "example": "chunk([1,2,3,4,5], 2) -> [[1,2],[3,4],[5]]",
+      "extra_tests": "def test_chunk_larger_than_input():\n    import candidate\n    assert candidate.chunk([1], 5) == [[1]]\n\ndef test_exact_multiple():\n    import candidate\n    assert candidate.chunk([1, 2, 3], 3) == [[1, 2, 3]]\n"
+    },
+    "hidden_tests": "def test_even_split():\n    import candidate\n    assert candidate.chunk([1,2,3,4], 2) == [[1,2],[3,4]]\n\ndef test_remainder():\n    import candidate\n    assert candidate.chunk([1,2,3,4,5], 2) == [[1,2],[3,4],[5]]\n\ndef test_empty():\n    import candidate\n    assert candidate.chunk([], 3) == []\n\ndef test_bad_size():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.chunk([1], 0)\n\ndef test_no_mutation():\n    import candidate\n    data = [1,2,3]\n    candidate.chunk(data, 2)\n    assert data == [1,2,3]\n",
+    "acceptance_tests": "def test_chunk_larger_than_input():\n    import candidate\n    assert candidate.chunk([1], 5) == [[1]]\n\ndef test_exact_multiple():\n    import candidate\n    assert candidate.chunk([1, 2, 3], 3) == [[1, 2, 3]]\n"
+  },
+  {
+    "task_id": "b04_buggy_off_by_one",
+    "category": "bugfix",
+    "buggy_seed": true,
+    "intent": {
+      "task_id": "b04_buggy_off_by_one",
+      "title": "Fix the off-by-one counter",
+      "description": "count_between(a, b) must return how many integers are in the inclusive range [a, b]. The current implementation is off by one.",
+      "function_name": "count_between",
+      "signature": "count_between(a: int, b: int) -> int",
+      "requirements": [
+        "Inclusive of both endpoints",
+        "Return 0 when b < a",
+        "Must not use range() length shortcuts that break for large values"
+      ],
+      "example": "count_between(3, 7) -> 5",
+      "extra_tests": "def test_ten_items():\n    import candidate\n    assert candidate.count_between(1, 10) == 10\n\ndef test_inverted_range():\n    import candidate\n    assert candidate.count_between(2, 1) == 0\n"
+    },
+    "buggy_code": "def count_between(a: int, b: int) -> int:\n    \"\"\"Count integers in [a, b].\"\"\"\n    return b - a\n",
+    "hidden_tests": "def test_inclusive():\n    import candidate\n    assert candidate.count_between(3, 7) == 5\n\ndef test_single():\n    import candidate\n    assert candidate.count_between(4, 4) == 1\n\ndef test_reversed():\n    import candidate\n    assert candidate.count_between(7, 3) == 0\n\ndef test_large():\n    import candidate\n    assert candidate.count_between(0, 10**9) == 10**9 + 1\n",
+    "acceptance_tests": "def test_ten_items():\n    import candidate\n    assert candidate.count_between(1, 10) == 10\n\ndef test_inverted_range():\n    import candidate\n    assert candidate.count_between(2, 1) == 0\n"
+  },
+  {
+    "task_id": "b05_buggy_mutable_default",
+    "category": "bugfix",
+    "buggy_seed": true,
+    "intent": {
+      "task_id": "b05_buggy_mutable_default",
+      "title": "Fix the shared-default accumulator",
+      "description": "append_tag(tag, tags) must return the tag list with the new tag appended, without leaking state between calls when the default is used.",
+      "function_name": "append_tag",
+      "signature": "append_tag(tag: str, tags: list[str] | None = None) -> list[str]",
+      "requirements": [
+        "Repeated calls without an explicit list must not share state",
+        "Preserve order, appending at the end",
+        "Do not mutate a caller-supplied list? No: return a new list",
+        "Raise ValueError for an empty tag"
+      ],
+      "example": "append_tag('a') -> ['a']",
+      "extra_tests": "def test_appends_to_given_list():\n    import candidate\n    assert candidate.append_tag('x', ['y']) == ['y', 'x']\n\ndef test_default_is_fresh_each_call():\n    import candidate\n    assert candidate.append_tag('p') == ['p']\n    assert candidate.append_tag('q') == ['q']\n"
+    },
+    "buggy_code": "def append_tag(tag: str, tags: list[str] = []) -> list[str]:\n    \"\"\"Append a tag.\"\"\"\n    tags.append(tag)\n    return tags\n",
+    "hidden_tests": "def test_no_shared_state():\n    import candidate\n    assert candidate.append_tag('a') == ['a']\n    assert candidate.append_tag('b') == ['b']\n\ndef test_explicit_list():\n    import candidate\n    assert candidate.append_tag('c', ['a','b']) == ['a','b','c']\n\ndef test_does_not_mutate_input():\n    import candidate\n    base = ['a']\n    candidate.append_tag('b', base)\n    assert base == ['a']\n\ndef test_empty_tag_raises():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.append_tag('')\n",
+    "acceptance_tests": "def test_appends_to_given_list():\n    import candidate\n    assert candidate.append_tag('x', ['y']) == ['y', 'x']\n\ndef test_default_is_fresh_each_call():\n    import candidate\n    assert candidate.append_tag('p') == ['p']\n    assert candidate.append_tag('q') == ['q']\n"
+  },
+  {
+    "task_id": "b06_buggy_silent_except",
+    "category": "bugfix",
+    "buggy_seed": true,
+    "intent": {
+      "task_id": "b06_buggy_silent_except",
+      "title": "Fix the silent failure",
+      "description": "safe_int(text) must convert a string to int, returning None only when the input is not a valid integer. The current version swallows every error, including programming mistakes.",
+      "function_name": "safe_int",
+      "signature": "safe_int(text: str) -> int | None",
+      "requirements": [
+        "Return the int value for valid numeric strings",
+        "Return None for a non-numeric string",
+        "Catch only the specific conversion exception, never a bare except",
+        "Raise TypeError when passed a non-string"
+      ],
+      "example": "safe_int('42') -> 42",
+      "extra_tests": "def test_zero_parses():\n    import candidate\n    assert candidate.safe_int('0') == 0\n\ndef test_float_string_is_rejected():\n    import candidate\n    assert candidate.safe_int('1.5') is None\n\ndef test_type_error_is_not_swallowed():\n    import candidate\n    import pytest\n    with pytest.raises(TypeError):\n        candidate.safe_int(None)\n"
+    },
+    "buggy_code": "def safe_int(text: str) -> int | None:\n    \"\"\"Convert to int or None.\"\"\"\n    try:\n        return int(text)\n    except:\n        return None\n",
+    "hidden_tests": "def test_valid():\n    import candidate\n    assert candidate.safe_int('42') == 42\n\ndef test_invalid():\n    import candidate\n    assert candidate.safe_int('abc') is None\n\ndef test_negative():\n    import candidate\n    assert candidate.safe_int('-7') == -7\n\ndef test_non_string_raises_typeerror():\n    import candidate\n    import pytest\n    with pytest.raises(TypeError):\n        candidate.safe_int(None)\n",
+    "acceptance_tests": "def test_zero_parses():\n    import candidate\n    assert candidate.safe_int('0') == 0\n\ndef test_float_string_is_rejected():\n    import candidate\n    assert candidate.safe_int('1.5') is None\n\ndef test_type_error_is_not_swallowed():\n    import candidate\n    import pytest\n    with pytest.raises(TypeError):\n        candidate.safe_int(None)\n"
+  },
+  {
+    "task_id": "b07_secure_password_store",
+    "category": "security",
+    "buggy_seed": true,
+    "intent": {
+      "task_id": "b07_secure_password_store",
+      "title": "Remove the hardcoded credential",
+      "description": "build_headers() must return an Authorization header. The current implementation hardcodes the API key. It must read the key from the DATABASE_API_KEY environment variable instead.",
+      "function_name": "build_headers",
+      "signature": "build_headers() -> dict[str, str]",
+      "requirements": [
+        "Read the key from os.environ['DATABASE_API_KEY']",
+        "Raise ValueError when the variable is missing or empty",
+        "Return {'Authorization': 'Bearer <key>'}",
+        "Never embed a literal credential in the source"
+      ],
+      "example": "build_headers() -> {'Authorization': 'Bearer abc123'}",
+      "min_args": 0,
+      "extra_tests": "def test_reads_environment(monkeypatch):\n    import candidate\n    monkeypatch.setenv('DATABASE_API_KEY', 'abc')\n    assert candidate.build_headers() == {'Authorization': 'Bearer abc'}\n\n\ndef test_raises_without_environment(monkeypatch):\n    import candidate\n    import pytest\n    monkeypatch.delenv('DATABASE_API_KEY', raising=False)\n    with pytest.raises(ValueError):\n        candidate.build_headers()\n"
+    },
+    "buggy_code": "API_KEY = \"sk-live-9f8a7b6c5d4e3f2a1b0c\"\n\n\ndef build_headers() -> dict[str, str]:\n    \"\"\"Build auth headers.\"\"\"\n    return {\"Authorization\": \"Bearer \" + API_KEY}\n",
+    "hidden_tests": "import os\n\ndef test_uses_env(monkeypatch):\n    import candidate\n    monkeypatch.setenv('DATABASE_API_KEY', 'from-env')\n    assert candidate.build_headers() == {'Authorization': 'Bearer from-env'}\n\ndef test_missing_env_raises(monkeypatch):\n    import candidate\n    import pytest\n    monkeypatch.delenv('DATABASE_API_KEY', raising=False)\n    with pytest.raises(ValueError):\n        candidate.build_headers()\n\ndef test_no_hardcoded_secret_in_source():\n    import candidate\n    import inspect\n    src = inspect.getsource(candidate)\n    assert 'sk-live' not in src\n",
+    "acceptance_tests": "def test_reads_environment(monkeypatch):\n    import candidate\n    monkeypatch.setenv('DATABASE_API_KEY', 'abc')\n    assert candidate.build_headers() == {'Authorization': 'Bearer abc'}\n\n\ndef test_raises_without_environment(monkeypatch):\n    import candidate\n    import pytest\n    monkeypatch.delenv('DATABASE_API_KEY', raising=False)\n    with pytest.raises(ValueError):\n        candidate.build_headers()\n"
+  },
+  {
+    "task_id": "b08_secure_sql_lookup",
+    "category": "security",
+    "buggy_seed": true,
+    "intent": {
+      "task_id": "b08_secure_sql_lookup",
+      "title": "Parameterise the SQL query",
+      "description": "find_user(cursor, user_id) must look a user up by id. The current implementation builds SQL with an f-string, which is injectable.",
+      "function_name": "find_user",
+      "signature": "find_user(cursor, user_id: int) -> str | None",
+      "requirements": [
+        "Use a parameterised query with a '?' placeholder and a params tuple",
+        "Return the first column of the first row, or None when no row matches",
+        "Validate that user_id is a positive int, raising ValueError otherwise",
+        "Never interpolate user_id into the SQL text"
+      ],
+      "example": "find_user(cursor, 7) -> 'alice'",
+      "extra_tests": "class _Empty:\n    def execute(self, sql, params=None):\n        self.sql = sql\n        self.params = params\n\n    def fetchone(self):\n        return None\n\n\ndef test_missing_row_returns_none():\n    import candidate\n    assert candidate.find_user(_Empty(), 3) is None\n\n\ndef test_query_is_parameterised():\n    import candidate\n    cur = _Empty()\n    candidate.find_user(cur, 3)\n    assert cur.params == (3,)\n    assert '?' in cur.sql\n"
+    },
+    "buggy_code": "def find_user(cursor, user_id: int) -> str | None:\n    \"\"\"Find a username by id.\"\"\"\n    cursor.execute(f\"SELECT name FROM users WHERE id = {user_id}\")\n    row = cursor.fetchone()\n    if row is None:\n        return None\n    return row[0]\n",
+    "hidden_tests": "class FakeCursor:\n    def __init__(self):\n        self.sql = None\n        self.params = None\n    def execute(self, sql, params=None):\n        self.sql = sql\n        self.params = params\n    def fetchone(self):\n        return ('alice',)\n\n\ndef test_returns_name():\n    import candidate\n    cur = FakeCursor()\n    assert candidate.find_user(cur, 7) == 'alice'\n\ndef test_uses_placeholder():\n    import candidate\n    cur = FakeCursor()\n    candidate.find_user(cur, 7)\n    assert '?' in cur.sql, cur.sql\n    assert '7' not in cur.sql, cur.sql\n    assert cur.params == (7,)\n\ndef test_rejects_bad_id():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.find_user(FakeCursor(), 0)\n",
+    "acceptance_tests": "class _Empty:\n    def execute(self, sql, params=None):\n        self.sql = sql\n        self.params = params\n\n    def fetchone(self):\n        return None\n\n\ndef test_missing_row_returns_none():\n    import candidate\n    assert candidate.find_user(_Empty(), 3) is None\n\n\ndef test_query_is_parameterised():\n    import candidate\n    cur = _Empty()\n    candidate.find_user(cur, 3)\n    assert cur.params == (3,)\n    assert '?' in cur.sql\n"
+  },
+  {
+    "task_id": "b09_secure_eval_trap",
+    "category": "security",
+    "buggy_seed": true,
+    "intent": {
+      "task_id": "b09_secure_eval_trap",
+      "title": "Replace eval with safe parsing",
+      "description": "parse_config(text) currently uses eval() to turn a Python-literal config into a dict. It must parse safely instead.",
+      "function_name": "parse_config",
+      "signature": "parse_config(text: str) -> dict[str, int]",
+      "requirements": [
+        "Use ast.literal_eval, never eval or exec",
+        "Reject input that is not a dict literal with ValueError",
+        "Reject non-integer values with ValueError",
+        "Reject an empty string with ValueError"
+      ],
+      "example": "parse_config(\"{'a': 1}\") -> {'a': 1}",
+      "extra_tests": "def test_parses_single_pair():\n    import candidate\n    assert candidate.parse_config(\"{'x': 9}\") == {'x': 9}\n\ndef test_rejects_arithmetic_expression():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.parse_config('1 + 1')\n"
+    },
+    "buggy_code": "def parse_config(text: str) -> dict[str, int]:\n    \"\"\"Parse a config dict.\"\"\"\n    return eval(text)\n",
+    "hidden_tests": "def test_parses_dict():\n    import candidate\n    assert candidate.parse_config(\"{'a': 1, 'b': 2}\") == {'a': 1, 'b': 2}\n\ndef test_rejects_code_execution():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.parse_config(\"__import__('os').system('echo pwned')\")\n\ndef test_rejects_non_dict():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.parse_config(\"[1, 2, 3]\")\n\ndef test_rejects_non_int_values():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.parse_config(\"{'a': 'x'}\")\n\ndef test_empty_raises():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.parse_config('')\n",
+    "acceptance_tests": "def test_parses_single_pair():\n    import candidate\n    assert candidate.parse_config(\"{'x': 9}\") == {'x': 9}\n\ndef test_rejects_arithmetic_expression():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.parse_config('1 + 1')\n"
+  },
+  {
+    "task_id": "b10_buggy_bare_typing",
+    "category": "bugfix",
+    "intent": {
+      "task_id": "b10_buggy_bare_typing",
+      "title": "Type-safe averaging",
+      "description": "average(values) must return the arithmetic mean of a list of numbers, with full type hints. The current version is untyped, crashes on empty input, and silently returns garbage for non-numeric entries.",
+      "function_name": "average",
+      "signature": "average(values: list[float]) -> float",
+      "requirements": [
+        "Raise ValueError for an empty list",
+        "Raise TypeError when a non-numeric element is present",
+        "Return a float",
+        "Fully typed signature and a docstring"
+      ],
+      "example": "average([1.0, 2.0, 3.0]) -> 2.0",
+      "extra_tests": "def test_equal_values():\n    import candidate\n    assert candidate.average([5, 5]) == 5.0\n\ndef test_string_element_raises():\n    import candidate\n    import pytest\n    with pytest.raises(TypeError):\n        candidate.average(['a'])\n"
+    },
+    "buggy_seed": true,
+    "buggy_code": "def average(values):\n    total = 0\n    for v in values:\n        total += v\n    return total / len(values)\n",
+    "hidden_tests": "def test_mean():\n    import candidate\n    assert candidate.average([1.0, 2.0, 3.0]) == 2.0\n\ndef test_empty_raises():\n    import candidate\n    import pytest\n    with pytest.raises(ValueError):\n        candidate.average([])\n\ndef test_non_numeric_raises():\n    import candidate\n    import pytest\n    with pytest.raises(TypeError):\n        candidate.average([1.0, 'x'])\n\ndef test_returns_float():\n    import candidate\n    assert isinstance(candidate.average([2, 4]), float)\n",
+    "acceptance_tests": "def test_equal_values():\n    import candidate\n    assert candidate.average([5, 5]) == 5.0\n\ndef test_string_element_raises():\n    import candidate\n    import pytest\n    with pytest.raises(TypeError):\n        candidate.average(['a'])\n"
+  }
+]

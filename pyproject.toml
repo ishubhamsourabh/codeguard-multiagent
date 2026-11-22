@@ -1,0 +1,22 @@
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "eval", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "C4", "SIM", "RUF"]
+ignore = [
+    "B008",   # FastAPI's File()/Depends() in defaults is idiomatic
+    "SIM108", # ternary rewrites hurt readability in the gate logic
+    "RUF001", # unicode arrows in docstrings are intentional
+    "RUF002",
+    "RUF003",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Benchmark task bodies are embedded source strings with intentional
+# constructs; linting their contents is meaningless.
+"eval/benchmark_tasks.json" = []
+
+[tool.ruff.format]
+quote-style = "double"
