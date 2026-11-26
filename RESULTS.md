@@ -10,8 +10,8 @@ python -m eval.run_benchmark --out eval/results.json
 | Field | Value |
 | --- | --- |
 | Run timestamp | 2026-11-23T00:54:58+0530 |
-| Model | `deepseek/deepseek-v4.1-flash` |
-| Backend | `https://api.commandcode.ai/provider/v1` (OpenAI-compatible) |
+| Model | OpenAI-compatible chat model (name recorded in `eval/results.json`) |
+| Backend | Any OpenAI-compatible chat-completions endpoint |
 | Max iterations | 3 |
 | Tasks | 10 |
 | Errors | 0 |

@@ -1,8 +1,7 @@
 """Thin OpenAI-compatible chat client used by the LLM-backed agents.
 
 Kept separate from the agents so they can be unit tested with a fake client
-and so the provider (commandcode.ai in the reference deployment) is swappable
-purely through environment variables.
+and so the provider is swappable purely through environment variables.
 """
 
 from __future__ import annotations

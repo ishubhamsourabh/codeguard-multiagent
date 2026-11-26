@@ -34,6 +34,9 @@ reports/
 *.pem
 *.key
 
+# --- Private working notes (personal / environment-specific) ---
+.private/
+
 # --- Benchmark artifacts (regenerate locally) ---
 eval/results.json
 eval/smoke*.json

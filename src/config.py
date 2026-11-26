@@ -44,26 +44,18 @@ class Settings:
     """Runtime configuration for the multi-agent graph."""
 
     api_key: str = field(
-        default_factory=lambda: (
-            os.getenv("CODEGUARD_API_KEY")
-            or os.getenv("COMMANDCODE_API_KEY")
-            or os.getenv("OPENAI_API_KEY")
-            or ""
-        )
+        default_factory=lambda: os.getenv("CODEGUARD_API_KEY") or os.getenv("OPENAI_API_KEY") or ""
     )
     base_url: str = field(
         default_factory=lambda: (
             os.getenv("CODEGUARD_BASE_URL")
-            or os.getenv("COMMANDCODE_BASE_URL")
             or os.getenv("OPENAI_BASE_URL")
             or "https://api.openai.com/v1"
         )
     )
     model: str = field(
         default_factory=lambda: (
-            os.getenv("CODEGUARD_MODEL")
-            or os.getenv("OPENAI_MODEL")
-            or "deepseek/deepseek-v4.1-flash"
+            os.getenv("CODEGUARD_MODEL") or os.getenv("OPENAI_MODEL") or "gpt-4o-mini"
         )
     )
     coder_temperature: float = field(
@@ -82,8 +74,8 @@ class Settings:
         """Return the API key or raise a descriptive error."""
         if not self.api_key:
             raise RuntimeError(
-                "No LLM API key configured. Set CODEGUARD_API_KEY (or "
-                "COMMANDCODE_API_KEY / OPENAI_API_KEY) in the environment or .env"
+                "No LLM API key configured. Set CODEGUARD_API_KEY "
+                "(or OPENAI_API_KEY) in the environment or .env"
             )
         return self.api_key
 

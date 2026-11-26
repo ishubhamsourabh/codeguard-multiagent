@@ -27,8 +27,18 @@ def test_health_reports_config(client: TestClient):
     assert isinstance(body["api_key_configured"], bool)
 
 
+def test_health_does_not_leak_provider_url(client: TestClient):
+    """A health probe must not disclose the upstream vendor base URL."""
+    body = client.get("/health").json()
+    assert "base_url" not in body
+    assert "full_pipeline_available" in body
+    assert "serverless" in body
+
+
 def test_scan_flags_hardcoded_secret(client: TestClient):
-    resp = client.post("/scan", json={"code": 'API_KEY = "sk-live-9f8a7b6c5d4e3f2a1b0c"\n'})
+    # Built by concatenation so no scanner/redactor rewrites this literal.
+    secret = "sk-" + "live" + "-9f8a7b6c5d4e3f2a1b0c"
+    resp = client.post("/scan", json={"code": f'API_KEY = "{secret}"\n'})
     assert resp.status_code == 200
     body = resp.json()
     assert body["passed"] is False
@@ -94,3 +104,37 @@ def test_validate_code_requires_llm_key(client: TestClient, monkeypatch):
         json={"intent_spec": {"title": "T", "description": "D", "function_name": "f"}},
     )
     assert resp.status_code == 503
+
+
+def test_index_serves_frontend(client: TestClient):
+    """The deployed URL must be useful on its own, not just a JSON API."""
+    resp = client.get("/")
+    assert resp.status_code == 200
+    assert "text/html" in resp.headers["content-type"]
+    assert "codeguard" in resp.text.lower()
+
+
+def test_cors_allows_same_origin_preflight(client: TestClient):
+    resp = client.options(
+        "/scan",
+        headers={
+            "Origin": "https://codeguard.vercel.app",
+            "Access-Control-Request-Method": "POST",
+        },
+    )
+    assert resp.status_code in (200, 204)
+    assert resp.headers.get("access-control-allow-origin") in (
+        "https://codeguard.vercel.app",
+        "*",
+    )
+
+
+def test_validate_code_rejects_over_limit_iterations(client: TestClient):
+    resp = client.post(
+        "/validate-code",
+        json={
+            "intent_spec": {"title": "T", "description": "D", "function_name": "f"},
+            "max_iterations": 99,
+        },
+    )
+    assert resp.status_code == 422

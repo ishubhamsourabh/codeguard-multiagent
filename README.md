@@ -144,8 +144,7 @@ bundle: attempt count, blocking findings with line numbers, and test state.
 ## Results
 
 Real numbers from an actual run — see [`RESULTS.md`](RESULTS.md) for the
-environment, per-task breakdown, and honest caveats. Design rationale and
-likely interview questions are in [`INTERVIEW_NOTES.md`](INTERVIEW_NOTES.md).
+environment, per-task breakdown, and honest caveats.
 
 Reproduce:
 
@@ -168,6 +167,44 @@ pass %, security-flaw catch %, and mean/median latency.
 - Gate block rate additionally runs the real scanner and real pytest against
   the vulnerable seed and asks the real routing function.
 - Failures, escalations, and errors are reported, not filtered out.
+
+---
+
+## Deployment
+
+The app serves its own front-end at `/`, so the deployed URL is directly usable.
+
+### Vercel (demo — free, no API key needed)
+
+```bash
+npm i -g vercel
+vercel deploy --prod
+```
+
+`vercel.json` is included. On Vercel the **`/scan` endpoint works fully**
+(in-process, deterministic, no LLM) and the front-end demo runs on it.
+
+**`/validate-code` returns 501 on Vercel**, deliberately. A full validation takes
+12–90 s (coder call + up to 3 retries + reviewer) and serverless functions are
+capped at ~10–60 s. The endpoint refuses with an explanation instead of being
+killed mid-run with an opaque timeout. `api.py` detects serverless via the
+`VERCEL` env var.
+
+### Container (full pipeline)
+
+Any host that runs a long-lived process — Fly.io, Railway, Render, Cloud Run,
+a VPS — supports the complete loop:
+
+```bash
+docker build -t codeguard .
+docker run -p 8000:8000 -e CODEGUARD_API_KEY=... -e CODEGUARD_BASE_URL=... \
+  -e CODEGUARD_MODEL=... codeguard
+```
+
+The image runs as a non-root user and has a `HEALTHCHECK` on `/health`.
+
+**If you expose either deployment publicly**, put a request cap or auth in
+front of it: every `/validate-code` call spends paid LLM tokens.
 
 ---
 
@@ -195,9 +232,9 @@ All via environment or `.env` (see `.env.example`):
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `CODEGUARD_API_KEY` | — | API key (falls back to `COMMANDCODE_API_KEY`, `OPENAI_API_KEY`) |
-| `CODEGUARD_BASE_URL` | commandcode | OpenAI-compatible endpoint |
-| `CODEGUARD_MODEL` | `deepseek/deepseek-v4.1-flash` | Chat model |
+| `CODEGUARD_API_KEY` | — | API key (falls back to `OPENAI_API_KEY`) |
+| `CODEGUARD_BASE_URL` | `https://api.openai.com/v1` | Any OpenAI-compatible endpoint |
+| `CODEGUARD_MODEL` | `gpt-4o-mini` | Chat model |
 | `CODEGUARD_MAX_ITERATIONS` | `3` | Coder attempts before escalation |
 | `CODEGUARD_PYTEST_TIMEOUT` | `30` | Seconds per pytest run |
 | `CODEGUARD_CODER_TEMPERATURE` | `0.2` | Coder sampling |
