@@ -1,3 +1,27 @@
+[project]
+name = "codeguard-multiagent"
+version = "0.1.0"
+description = "Multi-agent AI code validator and CI/CD quality gate"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+# Declared here as well as in requirements.txt because the Vercel Python
+# builder installs from pyproject.toml when one exists. Without a [project]
+# table the build succeeds but ships zero dependencies, and every request 500s.
+dependencies = [
+    "langgraph>=0.2.60",
+    "langchain-core>=0.3.0",
+    "openai>=1.50.0",
+    "pydantic>=2.7.0",
+    "python-dotenv>=1.0.0",
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
+    "httpx>=0.27.0",
+    "pytest>=8.0.0",
+    "pytest-timeout>=2.3.0",
+]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
