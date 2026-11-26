@@ -1,0 +1,25 @@
+# Never upload secrets or private material into a deployment bundle.
+# Vercel uploads the whole project directory unless told otherwise, so a local
+# .env would otherwise be packaged and readable inside the function.
+.env
+.env.*
+!.env.example
+.private/
+
+# Not needed at runtime
+tests/
+eval/
+reports/
+.github/
+.git/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.vercel/
+uv.lock
+node_modules/
+Dockerfile
+*.md
+!README.md
