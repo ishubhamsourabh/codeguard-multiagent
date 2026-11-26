@@ -9,6 +9,16 @@ or the attempt budget is spent.
 The design goal is that **no model gets to declare its own work correct**. Every
 verdict is produced by running code and parsing ASTs, never by trusting prose.
 
+**Live demo:** https://codeguard-multiagent.vercel.app — paste Python and get a
+real 12-rule audit in the browser (no key, no login). The full coder → pytest →
+reviewer loop needs a long-lived container; see [Deployment](#deployment).
+
+| | |
+| --- | --- |
+| Tests | 110 passing, 3 skipped (offline, zero API calls) |
+| Python | 3.11 – 3.13 |
+| Lint | `ruff check` + `ruff format --check` clean |
+
 ```
                     ┌──────────────────────────────────────────────┐
                     │                                              │
@@ -176,13 +186,16 @@ The app serves its own front-end at `/`, so the deployed URL is directly usable.
 
 ### Vercel (demo — free, no API key needed)
 
+Deployed at **https://codeguard-multiagent.vercel.app**.
+
 ```bash
 npm i -g vercel
 vercel deploy --prod
 ```
 
-`vercel.json` is included. On Vercel the **`/scan` endpoint works fully**
-(in-process, deterministic, no LLM) and the front-end demo runs on it.
+`vercel.json` is included. `.vercelignore` excludes `.env`, `.private/`, tests,
+and the benchmark from the upload bundle — **without it Vercel uploads the whole
+project directory, including any local `.env`.**
 
 **`/validate-code` returns 501 on Vercel**, deliberately. A full validation takes
 12–90 s (coder call + up to 3 retries + reviewer) and serverless functions are
